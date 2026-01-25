@@ -20,13 +20,30 @@ export default function SecurityQuestions() {
     setIsLoading(true);
 
     try {
-      await axios.post("http://192.168.29.173:8000/api/mfa/verify-questions/", {
-        user_id: state.user_id,
-        city: answers.city,
-        color: answers.color,
-      });
+      // await axios.post("http://localhost:8000/api/mfa/verify-questions/", {
+      //   user_id: state.user_id,
+      //   city: answers.city,
+      //   color: answers.color,
+      // });
 
-      navigate("/eco-home");
+      // navigate("/eco-home");
+      const res = await axios.post(
+        "http://localhost:8000/api/mfa/verify-questions/",
+        {
+          user_id: state.user_id,
+          city: answers.city,
+          color: answers.color,
+        }
+      );
+
+      /* ✅ STEP 4: STORE LOGIN SESSION */
+      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("is_admin", res.data.user.is_admin);
+
+      /* ➡️ FINAL REDIRECT */
+      navigate("/eco-home", { replace: true });
     } catch {
       setError("Incorrect answers. Please try again.");
     } finally {

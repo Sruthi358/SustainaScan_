@@ -56,7 +56,9 @@ export default function AuthLogin() {
       const location = await getAreaLocation();
 
       const res = await axios.post(
-        "http://192.168.29.173:8000/api/mfa/login/",
+        // "http://192.168.29.173:8000/api/mfa/login/",
+        // "http://10.73.115.82:8000/api/mfa/login/",
+        "http://localhost:8000/api/mfa/login/",
         {
           username,
           password,

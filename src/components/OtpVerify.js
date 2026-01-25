@@ -70,19 +70,44 @@ export default function OtpVerify() {
       const device = await getDeviceFingerprint();
       const locData = await getAreaLocationWithCoords();
 
-      await axios.post("http://192.168.29.173:8000/api/mfa/verify-otp/", {
-        otp,
-        user_id: state.user_id,
-        device_fingerprint: device,
-        location: locData.location,
-        latitude: locData.latitude,
-        longitude: locData.longitude,
-      });
+      // await axios.post("http://192.168.29.173:8000/api/mfa/verify-otp/", {
+      // await axios.post("http://localhost:8000/api/mfa/verify-otp/", {
+      //   otp,
+      //   user_id: state.user_id,
+      //   device_fingerprint: device,
+      //   location: locData.location,
+      //   latitude: locData.latitude,
+      //   longitude: locData.longitude,
+      // });
 
+      // if (state.level === "HIGH") {
+      //   navigate("/security-questions", { state });
+      // } else {
+      //   navigate("/");
+      // }
+      const res = await axios.post(
+        "http://localhost:8000/api/mfa/verify-otp/",
+        {
+          otp,
+          user_id: state.user_id,
+          device_fingerprint: device,
+          location: locData.location,
+          latitude: locData.latitude,
+          longitude: locData.longitude,
+        }
+      );
+
+      /* ✅ STEP 2: STORE LOGIN SESSION */
+      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("is_admin", res.data.user.is_admin);
+
+      /* ➡️ NEXT STEP */
       if (state.level === "HIGH") {
         navigate("/security-questions", { state });
       } else {
-        navigate("/");
+        navigate("/", { replace: true });
       }
     } catch {
       setError("Invalid OTP");

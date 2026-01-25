@@ -60,6 +60,44 @@ def setup_security_questions(request):
         print("MFA SETUP ERROR:", str(e))  # 👈 DEBUG
         return JsonResponse({"error": "Internal error"}, status=500)
 
+# @csrf_exempt
+# def verify_otp(request):
+#     data = json.loads(request.body.decode("utf-8"))
+
+#     otp = data.get("otp")
+#     user_id = data.get("user_id")
+
+#     record = OTP.objects.filter(
+#         user_id=user_id,
+#         otp=str(otp),
+#         is_verified=False
+#     ).last()
+
+#     if not record:
+#         return JsonResponse({"error": "Invalid OTP"}, status=401)
+
+#     record.is_verified = True
+#     record.save()
+
+#     profile = UserSecurityProfile.objects.get(user_id=user_id)
+
+#     # ✅ TRUST DEVICE & LOCATION AFTER OTP
+#     profile.trusted_device = data.get("device_fingerprint")
+#     profile.trusted_location = data.get("location")
+
+#     # (Optional but recommended)
+#     if hasattr(profile, "last_latitude"):
+#         profile.last_latitude = data.get("latitude")
+#         profile.last_longitude = data.get("longitude")
+
+#     profile.failed_attempts = 0
+#     profile.successful_logins += 1
+#     profile.save()
+
+#     return JsonResponse({"status": "OTP_VERIFIED"})
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
 @csrf_exempt
 def verify_otp(request):
     data = json.loads(request.body.decode("utf-8"))
@@ -79,39 +117,74 @@ def verify_otp(request):
     record.is_verified = True
     record.save()
 
-    profile = UserSecurityProfile.objects.get(user_id=user_id)
+    user = User.objects.get(id=user_id)
+    profile = UserSecurityProfile.objects.get(user=user)
 
-    # ✅ TRUST DEVICE & LOCATION AFTER OTP
     profile.trusted_device = data.get("device_fingerprint")
     profile.trusted_location = data.get("location")
-
-    # (Optional but recommended)
-    if hasattr(profile, "last_latitude"):
-        profile.last_latitude = data.get("latitude")
-        profile.last_longitude = data.get("longitude")
-
     profile.failed_attempts = 0
     profile.successful_logins += 1
     profile.save()
 
-    return JsonResponse({"status": "OTP_VERIFIED"})
+    # ✅ ISSUE TOKENS
+    refresh = RefreshToken.for_user(user)
+
+    return JsonResponse({
+        "status": "OTP_VERIFIED",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "is_admin": user.is_staff
+        }
+    })
+
+
+# @csrf_exempt
+# def verify_security_questions(request):
+#     try:
+#         data = json.loads(request.body.decode("utf-8"))
+#     except Exception:
+#         return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+#     user_id = data.get("user_id")
+
+#     questions = SecurityQuestion.objects.filter(user_id=user_id)[:2]
+
+#     for q in questions:
+#         if data.get(q.question_key, "").lower() != q.answer.lower():
+#             return JsonResponse({"error": "Wrong answer"}, status=401)
+
+#     return JsonResponse({"status": "LOGIN_SUCCESS"})
 
 @csrf_exempt
 def verify_security_questions(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except Exception:
-        return JsonResponse({"error": "Invalid JSON"}, status=400)
-
+    data = json.loads(request.body.decode("utf-8"))
     user_id = data.get("user_id")
 
-    questions = SecurityQuestion.objects.filter(user_id=user_id)[:2]
+    user = User.objects.get(id=user_id)
+    questions = SecurityQuestion.objects.filter(user=user)[:2]
 
     for q in questions:
         if data.get(q.question_key, "").lower() != q.answer.lower():
             return JsonResponse({"error": "Wrong answer"}, status=401)
 
-    return JsonResponse({"status": "LOGIN_SUCCESS"})
+    refresh = RefreshToken.for_user(user)
+
+    return JsonResponse({
+        "status": "LOGIN_SUCCESS",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "is_admin": user.is_staff
+        }
+    })
+
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
