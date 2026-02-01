@@ -6,12 +6,19 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 export default function Registration() {
   const navigate = useNavigate();
 
+  // const [security, setSecurity] = useState({
+  //   q1: "color",
+  //   a1: "",
+  //   q2: "city",
+  //   a2: "",
+  // });
   const [security, setSecurity] = useState({
-    q1: "color",
+    q1: "sign",
     a1: "",
     q2: "city",
     a2: ""
   });
+  
 
   const [formData, setFormData] = useState({
     username: "",
@@ -20,7 +27,7 @@ export default function Registration() {
     mobile_number: "",
     city_state: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [error, setError] = useState("");
@@ -71,8 +78,8 @@ export default function Registration() {
           mobile_number: formData.mobile_number,
           city_state: formData.city_state,
           password: formData.password,
-          confirmPassword: formData.confirmPassword
-        })
+          confirmPassword: formData.confirmPassword,
+        }),
       });
 
       const data = await response.json();
@@ -89,13 +96,12 @@ export default function Registration() {
           q1: security.q1,
           a1: security.a1,
           q2: security.q2,
-          a2: security.a2
-        })
+          a2: security.a2,
+        }),
       });
 
       setSuccess(true);
       setTimeout(() => navigate("/login"), 2000);
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -125,7 +131,6 @@ export default function Registration() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-
           {/* Username */}
           <div>
             <label className="block text-sm font-medium text-gray-900">
@@ -210,7 +215,9 @@ export default function Registration() {
               </button>
             </div>
             <div>
-              <label className="block text-sm font-medium">Confirm Password</label>
+              <label className="block text-sm font-medium">
+                Confirm Password
+              </label>
               <input
                 type={showPassword ? "text" : "password"}
                 name="confirmPassword"
@@ -268,76 +275,168 @@ export default function Registration() {
           </div> */}
 
           {/* 🔐 Security Questions */}
-<div className="space-y-6">
-  <h3 className="text-lg font-semibold text-gray-900">
-    Security Questions
-  </h3>
+          {/* <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Security Questions
+            </h3>
 
-  {/* Question 1 */}
-  <div>
-    <label className="block text-sm font-medium text-gray-900">
-      Security Question 1
-    </label>
-    <select
-      value={security.q1}
-      onChange={(e) => setSecurity({ ...security, q1: e.target.value })}
-      className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
-    >
-      <option value="color">Favorite color</option>
-      <option value="city">Birth city</option>
-      <option value="school">First school</option>
-      <option value="food">Favorite food</option>
-      <option value="pet">Pet name</option>
-      <option value="mother">Mother's first name</option>
-    </select>
-  </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Security Question 1
+              </label>
+              <select
+                value={security.q1}
+                onChange={(e) =>
+                  setSecurity({ ...security, q1: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
+              >
+                <option value="color">Favorite color</option>
+                <option value="city">Birth city</option>
+                <option value="school">First school</option>
+                <option value="food">Favorite food</option>
+                <option value="pet">Pet name</option>
+                <option value="mother">Mother's first name</option>
+              </select>
+            </div>
 
-  <div>
-    <label className="block text-sm font-medium text-gray-900">
-      Answer
-    </label>
-    <input
-      type="text"
-      value={security.a1}
-      onChange={(e) => setSecurity({ ...security, a1: e.target.value })}
-      className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
-      required
-    />
-  </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Answer
+              </label>
+              <input
+                type="text"
+                value={security.a1}
+                onChange={(e) =>
+                  setSecurity({ ...security, a1: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
+                required
+              />
+            </div>
 
-  {/* Question 2 */}
-  <div>
-    <label className="block text-sm font-medium text-gray-900">
-      Security Question 2
-    </label>
-    <select
-      value={security.q2}
-      onChange={(e) => setSecurity({ ...security, q2: e.target.value })}
-      className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
-    >
-      <option value="city">Birth city</option>
-      <option value="color">Favorite color</option>
-      <option value="school">First school</option>
-      <option value="food">Favorite food</option>
-      <option value="pet">Pet name</option>
-      <option value="mother">Mother's first name</option>
-    </select>
-  </div>
+           
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Security Question 2
+              </label>
+              <select
+                value={security.q2}
+                onChange={(e) =>
+                  setSecurity({ ...security, q2: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
+              >
+                <option value="city">Birth city</option>
+                <option value="color">Favorite color</option>
+                <option value="school">First school</option>
+                <option value="food">Favorite food</option>
+                <option value="pet">Pet name</option>
+                <option value="mother">Mother's first name</option>
+              </select>
+            </div>
 
-  <div>
-    <label className="block text-sm font-medium text-gray-900">
-      Answer
-    </label>
-    <input
-      type="text"
-      value={security.a2}
-      onChange={(e) => setSecurity({ ...security, a2: e.target.value })}
-      className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
-      required
-    />
-  </div>
-</div>
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Answer
+              </label>
+              <input
+                type="text"
+                value={security.a2}
+                onChange={(e) =>
+                  setSecurity({ ...security, a2: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md bg-white border border-gray-700 px-3 py-1.5 text-gray-900 focus:outline-2 focus:outline-teal-600"
+                required
+              />
+            </div>
+          </div> */}
 
+          {/* 🔐 Security Questions */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Security Questions
+            </h3>
+
+            {/* Question 1 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Security Question 1
+              </label>
+              <select
+                value={security.q1}
+                onChange={(e) =>
+                  setSecurity({ ...security, q1: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md border border-gray-700 px-3 py-1.5"
+                required
+              >
+                <option value="sign">What is your Zodiac Sign?</option>
+                <option value="city">What is your birth city?</option>
+                <option value="school">What is your first school name?</option>
+                <option value="sibling">How many siblings do you have?</option>
+                <option value="friend">What is your bestfriend name?</option>
+                <option value="mother">
+                  What is your mother’s first name?
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Answer
+              </label>
+              <input
+                type="text"
+                value={security.a1}
+                onChange={(e) =>
+                  setSecurity({ ...security, a1: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md border border-gray-700 px-3 py-1.5"
+                required
+              />
+            </div>
+
+            {/* Question 2 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Security Question 2
+              </label>
+              <select
+                value={security.q2}
+                onChange={(e) =>
+                  setSecurity({ ...security, q2: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md border border-gray-700 px-3 py-1.5"
+                required
+              >
+                <option value="sign">What is your Zodiac Sign?</option>
+                <option value="city">What is your birth city?</option>
+                <option value="school">What is your first school name?</option>
+                <option value="sibling">How many siblings do you have?</option>
+                <option value="friend">What is your bestfriend name?</option>
+                <option value="mother">
+                  What is your mother’s first name?
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Answer
+              </label>
+              <input
+                type="text"
+                value={security.a2}
+                onChange={(e) =>
+                  setSecurity({ ...security, a2: e.target.value })
+                }
+                className="mt-2 block w-full rounded-md border border-gray-700 px-3 py-1.5"
+                required
+              />
+            </div>
+          </div>
 
           <button
             type="submit"
@@ -352,7 +451,10 @@ export default function Registration() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" className="font-bold text-emerald-500 hover:text-teal-700">
+          <Link
+            to="/login"
+            className="font-bold text-emerald-500 hover:text-teal-700"
+          >
             Sign in
           </Link>
         </p>

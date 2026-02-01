@@ -8,95 +8,233 @@ from django.db import transaction
 from datetime import datetime
 from .models import UserSecurityProfile, OTP, SecurityQuestion
 from .risk_engine import calculate_risk
+from rest_framework_simplejwt.tokens import RefreshToken
 from .utils import send_otp
 import json, random
 
 User = get_user_model()
 
-@csrf_exempt
-@transaction.atomic   # 🔴 IMPORTANT
-def setup_security_questions(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid request"}, status=400)
+# @csrf_exempt
+# @transaction.atomic   # 🔴 IMPORTANT
+# def setup_security_questions(request):
+#     if request.method != "POST":
+#         return JsonResponse({"error": "Invalid request"}, status=400)
 
-    try:
-        data = json.loads(request.body.decode("utf-8"))
+#     try:
+#         data = json.loads(request.body.decode("utf-8"))
 
-        user_id = int(data.get("user_id"))
-        q1 = data.get("q1")
-        a1 = data.get("a1")
-        q2 = data.get("q2")
-        a2 = data.get("a2")
+#         user_id = int(data.get("user_id"))
+#         q1 = data.get("q1")
+#         a1 = data.get("a1")
+#         q2 = data.get("q2")
+#         a2 = data.get("a2")
 
-        if not all([user_id, q1, a1, q2, a2]):
-            return JsonResponse({"error": "Missing fields"}, status=400)
+#         if not all([user_id, q1, a1, q2, a2]):
+#             return JsonResponse({"error": "Missing fields"}, status=400)
 
-        user = User.objects.get(id=user_id)
+#         user = User.objects.get(id=user_id)
 
-        # 🔹 Create profile FIRST
-        UserSecurityProfile.objects.get_or_create(user=user)
+#         # 🔹 Create profile FIRST
+#         UserSecurityProfile.objects.get_or_create(user=user)
 
-        # 🔹 Clear old questions (important)
-        SecurityQuestion.objects.filter(user=user).delete()
+#         # 🔹 Clear old questions (important)
+#         SecurityQuestion.objects.filter(user=user).delete()
 
-        # 🔹 Create exactly 2 questions
-        SecurityQuestion.objects.create(
-            user=user,
-            question_key=q1,
-            answer=a1
-        )
-        SecurityQuestion.objects.create(
-            user=user,
-            question_key=q2,
-            answer=a2
-        )
+#         # 🔹 Create exactly 2 questions
+#         SecurityQuestion.objects.create(
+#             user=user,
+#             question_key=q1,
+#             answer=a1
+#         )
+#         SecurityQuestion.objects.create(
+#             user=user,
+#             question_key=q2,
+#             answer=a2
+#         )
 
-        return JsonResponse({"status": "SECURITY_SETUP_SUCCESS"})
+#         return JsonResponse({"status": "SECURITY_SETUP_SUCCESS"})
 
-    except User.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
+#     except User.DoesNotExist:
+#         return JsonResponse({"error": "User not found"}, status=404)
 
-    except Exception as e:
-        print("MFA SETUP ERROR:", str(e))  # 👈 DEBUG
-        return JsonResponse({"error": "Internal error"}, status=500)
+#     except Exception as e:
+#         print("MFA SETUP ERROR:", str(e))  # 👈 DEBUG
+#         return JsonResponse({"error": "Internal error"}, status=500)
 
 # @csrf_exempt
-# def verify_otp(request):
-#     data = json.loads(request.body.decode("utf-8"))
+# @transaction.atomic
+# def setup_security_questions(request):
+#     if request.method != "POST":
+#         return JsonResponse({"error": "Invalid request"}, status=400)
 
-#     otp = data.get("otp")
-#     user_id = data.get("user_id")
+#     try:
+#         data = json.loads(request.body.decode("utf-8"))
 
-#     record = OTP.objects.filter(
-#         user_id=user_id,
-#         otp=str(otp),
-#         is_verified=False
-#     ).last()
+#         q1 = data.get("q1")
+#         a1 = data.get("a1")
+#         q2 = data.get("q2")
+#         a2 = data.get("a2")
 
-#     if not record:
-#         return JsonResponse({"error": "Invalid OTP"}, status=401)
+#         if not all([q1, a1, q2, a2]):
+#             return JsonResponse({"error": "Missing fields"}, status=400)
 
-#     record.is_verified = True
-#     record.save()
+#         # ✅ USE JWT AUTH USER
+#         user = request.user
 
-#     profile = UserSecurityProfile.objects.get(user_id=user_id)
+#         if user.is_anonymous:
+#             return JsonResponse({"error": "Unauthorized"}, status=401)
 
-#     # ✅ TRUST DEVICE & LOCATION AFTER OTP
-#     profile.trusted_device = data.get("device_fingerprint")
-#     profile.trusted_location = data.get("location")
+#         UserSecurityProfile.objects.get_or_create(user=user)
 
-#     # (Optional but recommended)
-#     if hasattr(profile, "last_latitude"):
-#         profile.last_latitude = data.get("latitude")
-#         profile.last_longitude = data.get("longitude")
+#         SecurityQuestion.objects.filter(user=user).delete()
 
-#     profile.failed_attempts = 0
-#     profile.successful_logins += 1
-#     profile.save()
+#         SecurityQuestion.objects.create(
+#             user=user, question_key=q1, answer=a1
+#         )
+#         SecurityQuestion.objects.create(
+#             user=user, question_key=q2, answer=a2
+#         )
 
-#     return JsonResponse({"status": "OTP_VERIFIED"})
+#         return JsonResponse({"status": "SECURITY_SETUP_SUCCESS"})
 
-from rest_framework_simplejwt.tokens import RefreshToken
+#     except Exception as e:
+#         print("MFA SETUP ERROR:", e)
+#         return JsonResponse({"error": "Internal error"}, status=500)
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.db import transaction
+from .models import UserSecurityProfile, SecurityQuestion
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def setup_security_questions(request):
+    q1 = request.data.get("q1")
+    a1 = request.data.get("a1")
+    q2 = request.data.get("q2")
+    a2 = request.data.get("a2")
+
+    if not all([q1, a1, q2, a2]):
+        return Response({"error": "Missing fields"}, status=400)
+
+    user = request.user
+
+    UserSecurityProfile.objects.get_or_create(user=user)
+
+    SecurityQuestion.objects.filter(user=user).delete()
+
+    SecurityQuestion.objects.create(
+        user=user, question_key=q1, answer=a1
+    )
+    SecurityQuestion.objects.create(
+        user=user, question_key=q2, answer=a2
+    )
+
+    return Response({"status": "SECURITY_UPDATED"})
+
+    
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
+from .models import SecurityQuestion
+
+User = get_user_model()
+
+# @csrf_exempt
+# def get_security_questions(request):
+#     user = request.user
+
+#     questions = SecurityQuestion.objects.filter(user=user)[:2]
+
+#     data = []
+#     for q in questions:
+#         data.append({
+#             "question_key": q.question_key,
+#             "answer": q.answer
+#         })
+
+#     return JsonResponse({
+#         "questions": data
+#     })
+
+# @csrf_exempt
+# def get_security_questions(request):
+#     try:
+#         data = json.loads(request.body.decode("utf-8")) if request.body else {}
+#         user_id = request.user
+
+#         if not user_id:
+#             return JsonResponse({"questions": []})
+
+#         user = User.objects.get(id=user_id)
+#         questions = SecurityQuestion.objects.filter(user=user)[:2]
+
+#         return JsonResponse({
+#             "questions": [
+#                 {
+#                     "question_key": q.question_key,
+#                     "answer": q.answer
+#                 }
+#                 for q in questions
+#             ]
+#         })
+
+#     except Exception as e:
+#         return JsonResponse({"questions": [], "error": str(e)})
+
+# @csrf_exempt
+# def get_security_questions(request):
+#     user = request.user
+
+#     if user.is_anonymous:
+#         return JsonResponse({"questions": []}, status=401)
+
+#     questions = SecurityQuestion.objects.filter(user=user)[:2]
+
+#     return JsonResponse({
+#         "questions": [
+#             {
+#                 "question_key": q.question_key,
+#                 "answer": q.answer
+#             } for q in questions
+#         ]
+#     })
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def get_security_questions(request):
+#     questions = SecurityQuestion.objects.filter(user=request.user)[:2]
+
+#     return Response({
+#         "questions": [
+#             {
+#                 "question_key": q.question_key,
+#                 "answer": q.answer
+#             } for q in questions
+#         ]
+#     })
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_security_questions(request):
+    questions = SecurityQuestion.objects.filter(user=request.user)[:2]
+
+    return Response({
+        "questions": [
+            {
+                "question_key": q.question_key,
+                "answer": q.answer
+            } for q in questions
+        ]
+    })
+
+
 
 @csrf_exempt
 def verify_otp(request):
@@ -141,24 +279,6 @@ def verify_otp(request):
         }
     })
 
-
-# @csrf_exempt
-# def verify_security_questions(request):
-#     try:
-#         data = json.loads(request.body.decode("utf-8"))
-#     except Exception:
-#         return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-#     user_id = data.get("user_id")
-
-#     questions = SecurityQuestion.objects.filter(user_id=user_id)[:2]
-
-#     for q in questions:
-#         if data.get(q.question_key, "").lower() != q.answer.lower():
-#             return JsonResponse({"error": "Wrong answer"}, status=401)
-
-#     return JsonResponse({"status": "LOGIN_SUCCESS"})
-
 @csrf_exempt
 def verify_security_questions(request):
     data = json.loads(request.body.decode("utf-8"))
@@ -184,9 +304,6 @@ def verify_security_questions(request):
             "is_admin": user.is_staff
         }
     })
-
-
-from rest_framework_simplejwt.tokens import RefreshToken
 
 @csrf_exempt
 def adaptive_login(request):

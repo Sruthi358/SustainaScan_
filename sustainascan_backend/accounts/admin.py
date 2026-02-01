@@ -2,6 +2,25 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Ingredient, Product, Review, Cart, Product, Order, OrderItem
 
+from .models import BarcodeProduct
+
+
+@admin.register(BarcodeProduct)
+class BarcodeProductAdmin(admin.ModelAdmin):
+    list_display = (
+        "barcode",
+        "title",
+        "brand",
+        "category",
+        "ecoscore",
+        "carbon_footprint",
+        "toxicity",
+        "biodegradability",
+    )
+    search_fields = ("barcode", "title", "brand", "category")
+    list_filter = ("category", "brand")
+
+
 class CustomUserAdmin(UserAdmin):
     # Fields to display in the user list
     list_display = ('username', 'email', 'full_name', 'mobile_number', 'city_state')
