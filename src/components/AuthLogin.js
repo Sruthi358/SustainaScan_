@@ -54,11 +54,12 @@ export default function AuthLogin() {
     try {
       const device = await getDeviceFingerprint();
       const location = await getAreaLocation();
+      console.log(process.env.REACT_APP_PHONE_API_URL);
 
       const res = await axios.post(
-        // "http://192.168.29.173:8000/api/mfa/login/",
-        // "http://10.73.115.82:8000/api/mfa/login/",
-        "http://localhost:8000/api/mfa/login/",
+        // "http://10.209.81.82:8000/api/mfa/login/",
+        // "http://localhost:8000/api/mfa/login/",
+        `${process.env.REACT_APP_PHONE_API_URL}/api/mfa/login/`,
         {
           username,
           password,

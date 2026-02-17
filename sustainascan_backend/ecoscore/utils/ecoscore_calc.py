@@ -73,12 +73,16 @@ def calculate_ecoscore_from_ingredients(ingredients_text):
     toxicity_score = max(0, 100 - (total_toxicity * 10))
     bio_score = min(100, total_biodegradability)
 
-    ecoscore = (0.4 * cf_score) + (0.3 * toxicity_score) + (0.3 * bio_score) - 20
-    ecoscore = max(0, min(100, round(ecoscore, 1)))
+    #latest
+    total_cf = round(total_cf, 3)
+    # ecoscore = (0.4 * cf_score) + (0.3 * toxicity_score) + (0.3 * bio_score) - 20
+    # ecoscore = round(total_cf, 3)
+    # ecoscore = max(0, min(100, round(ecoscore, 1)))
 
     return {
-        "ecoscore": ecoscore,
-        "carbon_footprint": round(cf_score, 1),
+        "ecoscore": total_cf,
+        "carbon_footprint": total_cf,
         "toxicity": round(toxicity_score, 1),
         "biodegradability": round(bio_score, 1)
     }
+

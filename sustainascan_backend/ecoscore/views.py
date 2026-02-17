@@ -57,7 +57,8 @@ def get_barcode_alternative_products(request):
         alternatives = Product.objects.filter(
             category__icontains=base_product.name,
             ecoscore__isnull=False
-        ).order_by("-ecoscore")[:5]
+        # ).order_by("-ecoscore")[:5]
+        ).order_by("ecoscore")[:5]
 
         print("ALT COUNT:", alternatives.count())
 
@@ -140,21 +141,39 @@ def scan_barcode(request):
             })
 
         # 4️⃣ Get ingredients base product (CORRECT)
-        normalized = normalize_product_name(api_product["title"])
+        # normalized = normalize_product_name(api_product["title"])
 
-        base_product = Products.objects.filter(
-            name__icontains=normalized
-        ).first()
+        # base_product = Products.objects.filter(
+        #     name__icontains=normalized
+        # ).first()
 
-        # fallback only if nothing matches
+        # # fallback only if nothing matches
+        # if not base_product:
+        #     base_product = Products.objects.first()
+
+        #latest
+        title = api_product["title"].lower()
+
+        base_product = None
+        for p in Products.objects.all():
+            if p.name.lower() in title:
+                base_product = p
+                break
+
         if not base_product:
-            base_product = Products.objects.first()
+            return JsonResponse({
+                "success": False,
+                "message": "No matching product type found"
+            })
+
 
 
         if not base_product:
             return JsonResponse({
                 "success": False,
                 "message": "Ingredients not available yet"
+       
+       
             })
 
         # 5️⃣ Calculate ecoscore using REAL logic
@@ -225,7 +244,8 @@ def get_alternative_products(request):
         # Using case-insensitive contains for more flexible matching
         alternatives = Product.objects.filter(
             category__icontains=category
-        ).order_by('-ecoscore')[:5]
+        # ).order_by('-ecoscore')[:5]
+        ).order_by('ecoscore')[:5]
         
         # Ensure we're returning products with all required fields
         products_data = []
@@ -312,8 +332,10 @@ def calculate_ecoscore(request):
             bio_score = min(100, total_biodegradability)  # Higher is better
             
             # Calculate composite EcoScore
-            ecoscore = (0.4 * cf_score) + (0.3 * toxicity_score) + (0.3 * bio_score) - 20
-            ecoscore = max(0, min(100, round(ecoscore, 1)))
+            # ecoscore = (0.4 * cf_score) + (0.3 * toxicity_score) + (0.3 * bio_score) - 20
+            #latest
+            ecoscore = round(total_cf, 3)
+            # ecoscore = max(0, min(100, round(ecoscore, 1)))
         else:
             ecoscore = 0
             cf_score = 0
@@ -351,7 +373,8 @@ def calculate_ecoscore(request):
                 'unmatched': matches['unmatched']
             },
             'breakdown': {
-                'carbon_footprint': cf_score,
+                # 'carbon_footprint': cf_score,
+                'carbon_footprint': ecoscore,
                 'toxicity': toxicity_score,
                 'biodegradability': bio_score,
                 'total_ingredients': len(matches['exact_matches']) + len(matches['partial_matches']) + len(matches['unmatched']),

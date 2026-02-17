@@ -41,7 +41,7 @@ export default function ProductCard() {
 
             {/* Ecoscore */}
             <p className="mt-1 text-sm text-amber-600 font-medium">
-              EcoScore: {product.ecoscore.toFixed(1)} / 100
+              Carbon Footprint: {product.ecoscore.toFixed(1)} Kg of CO2
             </p>
 
             {/* Short Description */}

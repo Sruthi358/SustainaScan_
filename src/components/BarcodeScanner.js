@@ -433,7 +433,9 @@ const BarcodeScanner = ({ onResult }) => {
 
     try {
       const res = await fetch(
-        "http://127.0.0.1:8000/api/ecoscore/scan-barcode/",
+        // "http://127.0.0.1:8000/api/ecoscore/scan-barcode/",
+        // "http://10.209.81.82:8000/api/ecoscore/scan-barcode/",
+        `${process.env.REACT_APP_PHONE_API_URL}/api/ecoscore/scan-barcode/`,
         {
           method: "POST",
           body: formData,
@@ -481,7 +483,9 @@ const BarcodeScanner = ({ onResult }) => {
 
     try {
       const res = await fetch(
-        "http://127.0.0.1:8000/api/ecoscore/scan-barcode/",
+        // "http://127.0.0.1:8000/api/ecoscore/scan-barcode/",
+        // "http://10.209.81.82:8000/api/ecoscore/scan-barcode/",
+        `${process.env.REACT_APP_PHONE_API_URL}/api/ecoscore/scan-barcode/`,
         {
           method: "POST",
           body: formData,
@@ -567,6 +571,7 @@ const BarcodeScanner = ({ onResult }) => {
           <button
             onClick={() => setScanMode(null)}
             className="mt-2 text-sm text-red-500"
+
           >
             Cancel
           </button>

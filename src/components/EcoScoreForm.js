@@ -29,7 +29,9 @@ export default function EcoScoreForm({ onResult }) {
     formData.append("image", productImage);
 
     try {
-      const response = await fetch("http://localhost:8000/api/ecoscore/", {
+      // const response = await fetch("http://localhost:8000/api/ecoscore/", {
+      // const response = await fetch("http://10.209.81.82:8000/api/ecoscore/", {
+      const response = await fetch(`${process.env.REACT_APP_PHONE_API_URL}/api/ecoscore/`, {
         method: "POST",
         body: formData,
       });

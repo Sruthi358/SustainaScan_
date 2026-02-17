@@ -12,6 +12,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .utils import send_otp
 import json, random
 
+from .models import TrustedDevice
+
+
 User = get_user_model()
 
 # @csrf_exempt
@@ -258,8 +261,21 @@ def verify_otp(request):
     user = User.objects.get(id=user_id)
     profile = UserSecurityProfile.objects.get(user=user)
 
-    profile.trusted_device = data.get("device_fingerprint")
-    profile.trusted_location = data.get("location")
+    # profile.trusted_device = data.get("device_fingerprint")
+    # profile.trusted_location = data.get("location")
+
+    # device = data.get("device_fingerprint")
+    # location = data.get("location")
+    device = data.get("device_fingerprint", "").strip()
+    location = data.get("location", "").strip().lower()
+
+
+    TrustedDevice.objects.get_or_create(
+        user=user,
+        device_fingerprint=device,
+        location=location
+    )
+
     profile.failed_attempts = 0
     profile.successful_logins += 1
     profile.save()
@@ -347,10 +363,25 @@ def adaptive_login(request):
 
     risk = 0
 
-    is_new_device = (
-        profile.trusted_device and
-        profile.trusted_device != data.get("device_fingerprint")
-    )
+    # is_new_device = (
+    #     profile.trusted_device and
+    #     profile.trusted_device != data.get("device_fingerprint")
+    # )
+
+    # device = data.get("device_fingerprint")
+    # location = data.get("location")
+    device = data.get("device_fingerprint", "").strip()
+    location = data.get("location", "").strip().lower()
+
+
+    is_trusted = TrustedDevice.objects.filter(
+        user=user,
+        device_fingerprint=device,
+        location=location
+    ).exists()
+
+    is_new_device = not is_trusted
+
 
     # 🔴 Rule 3: Any device + ≥3 failures → HIGH RISK
     if profile.failed_attempts >= 3:
@@ -374,6 +405,13 @@ def adaptive_login(request):
         profile.trusted_device = risk_data["device"]
         profile.trusted_location = risk_data["location"]
         profile.save()
+
+        TrustedDevice.objects.get_or_create(
+            user=user,
+            device_fingerprint=device,
+            location=location
+        )
+
 
         # ✅ ISSUE JWT TOKENS (OLD LOGIN STYLE)
         refresh = RefreshToken.for_user(user)

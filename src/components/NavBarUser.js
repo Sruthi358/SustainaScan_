@@ -15,6 +15,9 @@ export default function NavBarUser(props) {
           <p className="font-bold text-xl">SustainaScan.</p>
           {/* Left Section: About, Contact, EcoScore */}
           <div className="flex items-center gap-4">
+          <Link to="/" className="cursor-pointer hover:text-teal-500">
+              Home
+            </Link>
             <Link to="/aboutUs" className="cursor-pointer hover:text-teal-500">
               About
             </Link>

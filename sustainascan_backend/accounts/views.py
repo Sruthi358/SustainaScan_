@@ -134,7 +134,9 @@ class AddProductView(APIView):
             cf_score = max(0, min(100, cf_score))     # Clamp to 0-100
 
             # Final Eco-Score
-            ecoscore = (0.4 * cf_score) + (0.3 * T) + (0.3 * B)
+            # ecoscore = (0.4 * cf_score) + (0.3 * T) + (0.3 * B)
+            #latest
+            ecoscore = round(total_cf,3)
 
             print("Valid Ingredients:", valid_ingredients)
             # Create product

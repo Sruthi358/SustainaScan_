@@ -84,6 +84,23 @@ export default function PaymentGateway() {
   };
 
   return (
+
+    <>
+    <header className='bg-gray-800 text-white px-6 py-4'>
+  <nav className='flex items-center justify-between text-sm font-medium gap-4 flex-wrap'>
+    <ul className='ml-auto mr-8'>
+      <li>
+        <button 
+          onClick={() => navigate(-1)} 
+          className='hover:text-teal-700'
+        >
+          Back
+        </button>
+      </li>
+    </ul>
+  </nav>
+</header>
+
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
       <div className="bg-white shadow-lg rounded-2xl w-full max-w-xl p-6 space-y-6">
         <h2 className="text-2xl font-bold text-center text-gray-800">
@@ -204,5 +221,6 @@ export default function PaymentGateway() {
         </button>
       </div>
     </div>
+    </>
   );
 }

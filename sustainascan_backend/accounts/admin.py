@@ -12,10 +12,7 @@ class BarcodeProductAdmin(admin.ModelAdmin):
         "title",
         "brand",
         "category",
-        "ecoscore",
         "carbon_footprint",
-        "toxicity",
-        "biodegradability",
     )
     search_fields = ("barcode", "title", "brand", "category")
     list_filter = ("category", "brand")
@@ -55,7 +52,6 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
         'price',
         'in_stock',
-        'ecoscore',
         'carbon_footprint',
         'date_added'
     )
@@ -92,8 +88,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('ingredient_name', 'carbon_emission_factor', 'default_proportion', 
-                   'toxicity', 'biodegradability')
+    list_display = ('ingredient_name', 'carbon_emission_factor', 'default_proportion')
     search_fields = ('ingredient_name',)
     raw_id_fields = ()  # Add any FK fields here if needed later
 

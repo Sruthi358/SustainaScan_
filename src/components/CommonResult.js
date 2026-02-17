@@ -15,6 +15,21 @@ export default function CommonResult({ result }) {
   /* ❗ DO NOT REMOVE THIS (barcode safety) */
   if (!product && !result.success && result.type !== "image") return null;
 
+  function getImpactLevel(value) {
+    if (value <= 0.5) return { label: "Good", color: "#16a34a", percent: 20 };
+    if (value <= 1.5)
+      return { label: "Average", color: "#eab308", percent: 50 };
+    if (value <= 3) return { label: "Bad", color: "#f97316", percent: 75 };
+    return { label: "Very Bad", color: "#dc2626", percent: 95 };
+  }
+
+  // const carbonValue = (product?.ecoscore +2) || 0;
+  const carbonValue =
+  result.type === "image"
+    ? (result.result?.ecoscore || 0) + 2
+    : (product?.ecoscore || 0) + 2;
+  const impact = getImpactLevel(carbonValue);
+
   return (
     <div className="mt-6 border-t pt-4 max-w-5xl mx-auto">
       {/* ================= BARCODE RESULT (UNCHANGED) ================= */}
@@ -39,14 +54,15 @@ export default function CommonResult({ result }) {
           </p>
 
           <p className="mt-2 font-bold text-green-600">
-            EcoScore: {ecoscore} / 100
+            Carbon Footprint: {ecoscore} Kg of CO2
           </p>
 
           {product.carbon_footprint !== undefined && (
             <>
-              <p>Carbon Footprint: {product.carbon_footprint}</p>
+              {/* <p>Carbon Footprint: {product.carbon_footprint}</p>
               <p>Toxicity: {product.toxicity}</p>
-              <p>Biodegradability: {product.biodegradability}</p>
+
+              <p>Biodegradability: {product.biodegradability}</p> */}
             </>
           )}
         </>
@@ -56,12 +72,49 @@ export default function CommonResult({ result }) {
       {result.type === "image" && result.result && (
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="text-xl font-bold text-center mb-2">
-            EcoScore (Ingredients Analysis)
+            Carbon Footprint (Ingredients Analysis)
           </h3>
 
           <p className="text-center text-green-700 font-semibold text-lg">
-            EcoScore: {result.result.ecoscore} / 100
+            This product releases {result.result.ecoscore + 2} Kg of CO2 into Envinronment
           </p>
+
+          <div className="relative w-full flex flex-col items-center mt-6">
+                  {/* Labels Above Arc */}
+                  <div className="flex justify-between w-full px-6 text-xs font-semibold mb-1">
+                    <span className="text-green-600">GOOD</span>
+                    <span className="text-yellow-500">AVG</span>
+                    <span className="text-red-600">BAD</span>
+                  </div>
+
+                  {/* Semi Circle */}
+                  <div className="relative w-64 h-32 overflow-hidden">
+                    <div className="absolute w-64 h-64 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500 rounded-full top-0"></div>
+
+                    {/* Needle */}
+                    <div
+                      className="absolute bottom-0 left-1/2 origin-bottom transition-transform duration-700 ease-in-out"
+                      style={{
+                        transform: `rotate(${impact.percent * 1.8 - 90}deg)`,
+                      }}
+                    >
+                      <div className="w-1 h-20 bg-black"></div>
+                    </div>
+
+                    {/* Center Circle */}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-black rounded-full"></div>
+                  </div>
+
+                  {/* Impact Label */}
+                  <div className="mt-4">
+                    <span
+                      className="px-4 py-1 rounded-full text-white text-sm font-semibold"
+                      style={{ backgroundColor: impact.color }}
+                    >
+                      {impact.label}
+                    </span>
+                  </div>
+                </div>
 
           {/* <div className="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
             <div>
@@ -102,7 +155,9 @@ export default function CommonResult({ result }) {
                     src={
                       p.product_image.startsWith("http")
                         ? p.product_image
-                        : `http://127.0.0.1:8000${p.product_image}`
+                        // : `http://127.0.0.1:8000${p.product_image}`
+                        : `http://10.209.81.82:8000${p.product_image}`
+
                     }
                     className="w-full h-full object-cover"
                     alt={p.product_name}
@@ -122,7 +177,7 @@ export default function CommonResult({ result }) {
                 </p>
 
                 <p className="text-amber-600">
-                  EcoScore: {p.ecoscore?.toFixed(1)} / 100
+                  Carbon Footprint: {p.ecoscore?.toFixed(1)} Kg of CO2
                 </p>
 
                 {/* Short Description */}

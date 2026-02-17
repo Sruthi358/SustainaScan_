@@ -303,255 +303,425 @@ export default function ProductDetail() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Review Modal */}
-      {showReviewModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4">Add Your Review</h3>
-            <form onSubmit={handleReviewSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Rating</label>
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => handleStarClick(star)}
-                      className="text-2xl focus:outline-none"
-                    >
-                      {star <= reviewForm.rating ? "★" : "☆"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="mb-4">
-                <label htmlFor="comment" className="block text-gray-700 mb-2">
-                  Review
-                </label>
-                <textarea
-                  id="comment"
-                  name="comment"
-                  rows="4"
-                  className="w-full px-3 py-2 border rounded-lg"
-                  value={reviewForm.comment}
-                  onChange={handleReviewChange}
-                  required
-                ></textarea>
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowReviewModal(false)}
-                  className="px-4 py-2 border rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+  // function getImpactLevel(value) {
+  //   if (value <= 0.5)
+  //     return { label: "Low Impact", color: "#16a34a", percent: 25 };
+  //   if (value <= 1.5)
+  //     return { label: "Moderate Impact", color: "#eab308", percent: 50 };
+  //   if (value <= 3)
+  //     return { label: "High Impact", color: "#f97316", percent: 75 };
+  //   return { label: "Very High Impact", color: "#dc2626", percent: 100 };
+  // }
+  function getImpactLevel(value) {
+    if (value <= 0.5) return { label: "Good", color: "#16a34a", percent: 20 };
+    if (value <= 1.5)
+      return { label: "Average", color: "#eab308", percent: 50 };
+    if (value <= 3) return { label: "Bad", color: "#f97316", percent: 75 };
+    return { label: "Very Bad", color: "#dc2626", percent: 95 };
+  }
 
-      <div className="container mx-auto">
-        {/* Back link */}
-        <div className="p-4 mb-4">
+  const carbonValue = product?.ecoscore || 0;
+  const impact = getImpactLevel(carbonValue);
+
+  return (
+    <>
+      <header className="bg-gray-800 text-white px-6 py-4 mb-8">
+        <nav className="flex items-center justify-between text-sm font-medium gap-4 flex-wrap">
+          <ul className="ml-auto mr-8">
+            <li>
+              {/* <Link to="/" className='hover:text-teal-700'>Back</Link> */}
+              <button
+                onClick={() => navigate(-1)}
+                className="hover:text-teal-700"
+              >
+                Back
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Review Modal */}
+        {showReviewModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-xl font-bold mb-4">Add Your Review</h3>
+              <form onSubmit={handleReviewSubmit}>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Rating</label>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => handleStarClick(star)}
+                        className="text-2xl focus:outline-none"
+                      >
+                        {star <= reviewForm.rating ? "★" : "☆"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="comment" className="block text-gray-700 mb-2">
+                    Review
+                  </label>
+                  <textarea
+                    id="comment"
+                    name="comment"
+                    rows="4"
+                    className="w-full px-3 py-2 border rounded-lg"
+                    value={reviewForm.comment}
+                    onChange={handleReviewChange}
+                    required
+                  ></textarea>
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowReviewModal(false)}
+                    className="px-4 py-2 border rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <div className="container mx-auto">
+          {/* Back link */}
+          {/* <div className="p-4 mb-4">
           <button
             onClick={() => navigate(-1)}
             className="text-teal-600 hover:underline"
           >
             &larr; Back to products
           </button>
-        </div>
+        </div> */}
 
-        {/* Main product section */}
-        <div className="flex flex-col lg:flex-row gap-6 ml-7">
-          {/* Left Box: Product Details */}
-          <div className="lg:w-2/3 bg-white shadow-md rounded-lg overflow-hidden p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Product Image */}
-              <div className="md:w-1/2 p-4 rounded-lg flex items-center justify-center">
-                <img
-                  src={product.product_image}
-                  alt={product.product_name}
-                  className="w-full h-auto max-h-96 object-contain rounded-md"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://via.placeholder.com/300x300?text=No+Image";
-                  }}
-                />
-              </div>
-
-              {/* Product Info */}
-              <div className="md:w-1/2 flex flex-col">
-                <h1 className="text-xl font-bold text-gray-900 uppercase">
-                  {product.product_name}
-                </h1>
-
-                <div className="mt-2 flex items-center">
-                  <span
-                    className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
-                      product.in_stock
-                        ? "bg-teal-100 text-teal-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {product.in_stock ? "In Stock" : "Out of Stock"}
-                  </span>
+          {/* Main product section */}
+          <div className="flex flex-col lg:flex-row gap-6 ml-7">
+            {/* Left Box: Product Details */}
+            <div className="lg:w-2/3 bg-white shadow-md rounded-lg overflow-hidden p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Product Image */}
+                <div className="md:w-1/2 p-4 rounded-lg flex items-center justify-center">
+                  <img
+                    src={product.product_image}
+                    alt={product.product_name}
+                    className="w-full h-auto max-h-96 object-contain rounded-md"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://via.placeholder.com/300x300?text=No+Image";
+                    }}
+                  />
                 </div>
 
-                <p className="mt-4 text-green-900 text-2xl font-bold">
-                  ₹{product.price.toFixed(2)}
-                </p>
+                {/* Product Info */}
+                <div className="md:w-1/2 flex flex-col">
+                  <h1 className="text-xl font-bold text-gray-900 uppercase">
+                    {product.product_name}
+                  </h1>
 
-                <div className="mt-4 text-gray-700">
-                  {product.product_description?.slice(0, 200)}...
-                </div>
+                  <div className="mt-2 flex items-center">
+                    <span
+                      className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
+                        product.in_stock
+                          ? "bg-teal-100 text-teal-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {product.in_stock ? "In Stock" : "Out of Stock"}
+                    </span>
+                  </div>
 
-                {/* Quantity and Action buttons */}
-                <div className="mt-auto pt-6">
-                  <div className="flex flex-col sm:flex-row gap-3 items-start">
-                    <div className="flex items-center border rounded-lg">
-                      <button
-                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200"
-                      >
-                        -
-                      </button>
-                      <span className="px-2 py-1">{quantity}</span>
-                      <button
-                        onClick={() => setQuantity((q) => q + 1)}
-                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-4 w-full">
-                      <button
-                        onClick={handleAddToCart}
-                        className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-1 px-2 rounded-lg font-small transition"
-                      >
-                        Add to Cart
-                      </button>
-                      {/* <button
+                  <p className="mt-4 text-green-900 text-2xl font-bold">
+                    ₹{product.price.toFixed(2)}
+                  </p>
+
+                  <div className="mt-4 text-gray-700">
+                    {product.product_description?.slice(0, 200)}...
+                  </div>
+
+                  {/* Quantity and Action buttons */}
+                  <div className="mt-auto pt-6">
+                    <div className="flex flex-col sm:flex-row gap-3 items-start">
+                      <div className="flex items-center border rounded-lg">
+                        <button
+                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                          className="px-2 py-1 bg-gray-100 hover:bg-gray-200"
+                        >
+                          -
+                        </button>
+                        <span className="px-2 py-1">{quantity}</span>
+                        <button
+                          onClick={() => setQuantity((q) => q + 1)}
+                          className="px-2 py-1 bg-gray-100 hover:bg-gray-200"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-4 w-full">
+                        <button
+                          onClick={handleAddToCart}
+                          className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-1 px-2 rounded-lg font-small transition"
+                        >
+                          Add to Cart
+                        </button>
+                        {/* <button
                         className="flex-1 border border-teal-600 hover:bg-teal-600 hover:text-white text-teal-600 py-1 px-2 rounded-lg font-small transition"
                         onClick={handleOnClickBuyNow}
                       >
                         Buy Now
                       </button> */}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Box: Metrics */}
-          <div className="lg:w-1/3 flex flex-col gap-6 mr-7">
-            {/* Product Metrics */}
-            <div className="bg-white shadow-md rounded-lg overflow-hidden p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
+            {/* Right Box: Metrics */}
+            {/* <div className="lg:w-1/3 flex flex-col gap-6 mr-7">
+              Product Metrics
+              <div className="bg-white shadow-md rounded-lg overflow-hidden p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  Product Sustainability Metrics
+                </h2>
+                {[
+                  // latest
+                  // ["Toxicity", 100 - (product.toxicity_score || 0)],
+                  // ["Biodegradability", product.biodegradability_score || 0],
+                  // ["Carbon Footprint", product.carbon_footprint || 0],
+                  // ["EcoScore - Carbon Footprint", product.ecoscore || 0],
+                  ["Carbon Footprint", product.ecoscore || 0],
+                ].map(([label, pct]) => (
+                  <div key={label} className="mb-4">
+                    <div className="flex justify-between text-sm text-gray-700">
+                      <span>{label}</span>
+                      <span>{pct} Kg of CO2 </span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-700">
+                      <span>
+                        A carbon footprint is the total amount of greenhouse
+                        gases—including carbon dioxide and methane—generated by
+                        human actions, such as consuming energy, driving, or
+                        producing goods.{" "}
+                      </span>
+                      <br />
+                      SPEEDOMETER GAUGE
+                      <div className="relative w-full h-32 mt-20">
+                        <div className="absolute w-full h-32 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500 rounded-t-full"></div>
+
+                        Needle
+                        <div
+                          className="absolute bottom-0 left-1/2 origin-bottom"
+                          style={{
+                            transform: `rotate(${
+                              impact.percent * 1.8 - 90
+                            }deg)`,
+                          }}
+                        >
+                          <div className="w-1 h-16 bg-black"></div>
+                        </div>
+
+                        Center Circle
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-black rounded-full"></div>
+                      </div>
+
+                      Impact Label
+                      <div className="text-center mt-4">
+                        <span
+                          className="px-3 py-1 rounded-full text-white text-sm font-semibold"
+                          style={{ backgroundColor: impact.color }}
+                        >
+                          {impact.label}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded overflow-hidden">
+                      <div
+                        className="h-full bg-teal-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div> */}
+            {/* <div className="bg-white shadow-md rounded-lg overflow-hidden p-6"> */}
+            <div className="lg:w-1/3 max-w-md bg-white shadow-md rounded-lg overflow-hidden p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 pl-10">
                 Product Sustainability Metrics
               </h2>
-              {[
-                ["Toxicity", 100 - (product.toxicity_score || 0)],
-                ["Biodegradability", product.biodegradability_score || 0],
-                ["Carbon Footprint", product.carbon_footprint || 0],
-                ["EcoScore", product.ecoscore || 0],
-              ].map(([label, pct]) => (
-                <div key={label} className="mb-4">
-                  <div className="flex justify-between text-sm text-gray-700">
-                    <span>{label}</span>
-                    <span>{pct}%</span>
+
+              <div className="mb-4">
+                <div className="flex justify-between text-sm text-gray-700">
+                  <span className="pl-20">Carbon Footprint - {carbonValue} Kg CO₂</span>
+                </div>
+
+                
+
+                {/* SPEEDOMETER GAUGE */}
+                {/* <div className="relative w-full h-32 mt-6">
+                  <div className="absolute w-full h-32 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500 rounded-t-full"></div>
+
+                  Needle
+                  <div
+                    className="absolute bottom-0 left-1/2 origin-bottom"
+                    style={{
+                      transform: `rotate(${impact.percent * 1.8 - 90}deg)`,
+                    }}
+                  >
+                    <div className="w-1 h-16 bg-black"></div>
                   </div>
-                  <div className="h-2 bg-gray-200 rounded overflow-hidden">
+
+                  Center Circle
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-black rounded-full"></div>
+                </div> */}
+                {/* SPEEDOMETER GAUGE */}
+                <div className="relative w-full flex flex-col items-center mt-6">
+                  {/* Labels Above Arc */}
+                  <div className="flex justify-between w-full px-6 text-xs font-semibold mb-1">
+                    <span className="text-green-600">GOOD</span>
+                    <span className="text-yellow-500">AVG</span>
+                    <span className="text-red-600">BAD</span>
+                  </div>
+
+                  {/* Semi Circle */}
+                  <div className="relative w-64 h-32 overflow-hidden">
+                    <div className="absolute w-64 h-64 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500 rounded-full top-0"></div>
+
+                    {/* Needle */}
                     <div
-                      className="h-full bg-teal-500"
-                      style={{ width: `${pct}%` }}
-                    />
+                      className="absolute bottom-0 left-1/2 origin-bottom transition-transform duration-700 ease-in-out"
+                      style={{
+                        transform: `rotate(${impact.percent * 1.8 - 90}deg)`,
+                      }}
+                    >
+                      <div className="w-1 h-20 bg-black"></div>
+                    </div>
+
+                    {/* Center Circle */}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-black rounded-full"></div>
+                  </div>
+
+                  {/* Impact Label */}
+                  <div className="mt-4">
+                    <span
+                      className="px-4 py-1 rounded-full text-white text-sm font-semibold"
+                      style={{ backgroundColor: impact.color }}
+                    >
+                      {impact.label}
+                    </span>
                   </div>
                 </div>
-              ))}
+
+                <p className="pt-6"><b>What is Carbon footprint?</b></p>
+                <p className="text-sm text-gray-600 mt-2 text-justify">
+                A carbon footprint is the total amount of greenhouse
+                        gases—including carbon dioxide and methane—generated by
+                        human actions, such as consuming energy, driving, or
+                        producing goods.
+                </p>
+
+                {/* Impact Label */}
+                {/* <div className="text-center mt-4">
+                  <span
+                    className="px-3 py-1 rounded-full text-white text-sm font-semibold"
+                    style={{ backgroundColor: impact.color }}
+                  >
+                    {impact.label}
+                  </span>
+                </div> */}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Tabs Section */}
-        <div className="mt-6 m-7 bg-white shadow-md rounded-lg overflow-hidden p-6">
-          <div className="flex space-x-4 mb-4 border-b">
-            {Object.keys(tabs).map((key) => (
+          {/* Tabs Section */}
+          <div className="mt-6 m-7 bg-white shadow-md rounded-lg overflow-hidden p-6">
+            <div className="flex space-x-4 mb-4 border-b">
+              {Object.keys(tabs).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`py-2 px-4 font-semibold ${
+                    activeTab === key
+                      ? "border-b-2 border-green-600 text-green-600"
+                      : "text-gray-600 hover:text-green-600"
+                  }`}
+                >
+                  {tabs[key].title}
+                </button>
+              ))}
+            </div>
+
+            <div className="text-gray-700 whitespace-pre-line text-justify px-5">
+              {tabs[activeTab].content}
+            </div>
+          </div>
+
+          {/* Reviews section */}
+          <div className="my-6 bg-white shadow-md rounded-lg overflow-hidden p-6 mx-7">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase">
+              Reviews ({reviews.length})
+            </h3>
+
+            {reviews.length > 0 ? (
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="border-b pb-4 last:border-b-0"
+                  >
+                    <div className="flex items-center mb-2">
+                      <div className="font-semibold text-gray-800">
+                        {review.username || "Anonymous"}
+                      </div>
+                      <div className="flex ml-2">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className="text-yellow-500">
+                            {i < review.rating ? "★" : "☆"}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-sm text-gray-500 ml-auto">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <p className="text-gray-700">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">
+                No reviews yet. Be the first to review!
+              </p>
+            )}
+
+            <div className="text-center py-8">
               <button
-                key={key}
-                onClick={() => setActiveTab(key)}
-                className={`py-2 px-4 font-semibold ${
-                  activeTab === key
-                    ? "border-b-2 border-green-600 text-green-600"
-                    : "text-gray-600 hover:text-green-600"
-                }`}
+                onClick={() => setShowReviewModal(true)}
+                className="bg-teal-600 hover:bg-teal-700 text-white py-2 px-6 rounded-lg font-medium transition uppercase"
               >
-                {tabs[key].title}
+                {reviews.length > 0
+                  ? "Write a Review"
+                  : "Be the First to Review"}
               </button>
-            ))}
-          </div>
-
-          <div className="text-gray-700 whitespace-pre-line text-justify px-5">
-            {tabs[activeTab].content}
-          </div>
-        </div>
-
-        {/* Reviews section */}
-        <div className="my-6 bg-white shadow-md rounded-lg overflow-hidden p-6 mx-7">
-          <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase">
-            Reviews ({reviews.length})
-          </h3>
-
-          {reviews.length > 0 ? (
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <div key={review.id} className="border-b pb-4 last:border-b-0">
-                  <div className="flex items-center mb-2">
-                    <div className="font-semibold text-gray-800">
-                      {review.username || "Anonymous"}
-                    </div>
-                    <div className="flex ml-2">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500">
-                          {i < review.rating ? "★" : "☆"}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="text-sm text-gray-500 ml-auto">
-                      {new Date(review.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <p className="text-gray-700">{review.comment}</p>
-                </div>
-              ))}
             </div>
-          ) : (
-            <p className="text-gray-500 text-center py-4">
-              No reviews yet. Be the first to review!
-            </p>
-          )}
-
-          <div className="text-center py-8">
-            <button
-              onClick={() => setShowReviewModal(true)}
-              className="bg-teal-600 hover:bg-teal-700 text-white py-2 px-6 rounded-lg font-medium transition uppercase"
-            >
-              {reviews.length > 0 ? "Write a Review" : "Be the First to Review"}
-            </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

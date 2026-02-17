@@ -221,7 +221,7 @@ export default function EcoHome() {
                 </h3>
 
                 <p className="text-xs text-green-600 font-medium mt-1">
-                  EcoScore ✓
+                  EcoFriendly ✓
                 </p>
               </div>
             ))}

@@ -54,3 +54,21 @@ class OTP(models.Model):
 #     otp = models.CharField(max_length=6)
 #     is_verified = models.BooleanField(default=False)
 #     created_at = models.DateTimeField(auto_now_add=True)  # ✅ REQUIRED
+
+
+class TrustedDevice(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="trusted_devices"
+    )
+
+    device_fingerprint = models.CharField(max_length=256)
+    location = models.CharField(max_length=150)
+    last_used = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "device_fingerprint", "location")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.location}"

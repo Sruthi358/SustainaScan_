@@ -148,14 +148,31 @@ export default function Cart() {
   }
 
   return (
+<>
+    <header className='bg-gray-800 text-white px-6 py-4 mb-8'>
+          <nav className='flex items-center justify-between text-sm font-medium gap-4 flex-wrap'>
+              <ul className='ml-auto mr-8'>
+                  <li>
+                    {/* <Link to="/" className='hover:text-teal-700'>Back</Link> */}
+                    <button
+          onClick={() => navigate(-1)}
+          className='hover:text-teal-700'
+        >
+          Back
+        </button>
+                  </li>
+              </ul>
+          </nav>
+      </header>
+
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <Link
+        {/* <Link
           to="/home-user"
           className="inline-block text-teal-600 hover:underline"
         >
           &larr; Back to products
-        </Link>
+        </Link> */}
         <h1 className="text-3xl font-bold text-gray-800 mb-8 mt-8">
           Your Cart
         </h1>
@@ -289,5 +306,6 @@ export default function Cart() {
         )}
       </div>
     </div>
+    </>
   );
 }

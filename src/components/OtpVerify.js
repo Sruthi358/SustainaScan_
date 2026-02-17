@@ -86,7 +86,9 @@ export default function OtpVerify() {
       //   navigate("/");
       // }
       const res = await axios.post(
-        "http://localhost:8000/api/mfa/verify-otp/",
+        // "http://localhost:8000/api/mfa/verify-otp/",
+        // "http://10.209.81.82:8000/api/mfa/verify-otp/",
+        `${process.env.REACT_APP_PHONE_API_URL}/api/mfa/verify-otp/`,
         {
           otp,
           user_id: state.user_id,

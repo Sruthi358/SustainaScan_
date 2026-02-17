@@ -70,6 +70,7 @@ function MainContent() {
               onEcoScoreClick={handleEcoScoreClick}
             />
             <ProductListing searchTerm={searchTerm} />
+            <Footer />
           </>
         }
       />
@@ -85,30 +86,58 @@ function MainContent() {
       <Route path="/sus-news" element={<SustainabilityNews />} />
       <Route path="/otp" element={<OtpVerify />} />
       <Route path="/security-questions" element={<SecurityQuestions />} />
-      <Route path="/login" element={<AuthLogin />} />
+      <Route path="/login" element={
+        <>
+        <RegisterLoginNavBar Button="Back" />
+        <AuthLogin />
+        {/* <Footer /> */}
+        </>
+      } />
       <Route path="/home" element={<h1>Welcome Home</h1>} />
-      <Route path="/products/:id" element={<ProductDetail />} />
+      <Route path="/products/:id" element={
+        <>
+        {/* <RegisterLoginNavBar Button="Home" /> */}
+        <ProductDetail />
+        </>
+      } />
       <Route
         path="/aboutUs"
         element={
           <>
             <RegisterLoginNavBar Button="Home" />
             <AboutUs />
+            <Footer />
           </>
         }
       />
-      <Route path="/cart" element={<Cart />} />
+      <Route path="/cart" element={
+        <>
+        <Cart />
+        <Footer />
+        </>
+      } />
       <Route
         path="/contactUs"
         element={
           <>
             <RegisterLoginNavBar Button="Home" />
             <ContactUs />
+            <Footer />
           </>
         }
       />
-      <Route path="/payment-gateway" element={<PaymentGateway />} />
-      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/payment-gateway" element={
+        <>
+        <PaymentGateway />
+        <Footer />
+        </>
+      } />
+      <Route path="/payment-success" element={
+        <>
+        <PaymentSuccess />
+        <Footer />
+        </>
+      } />
       <Route
         path="/registration"
         element={
@@ -120,8 +149,18 @@ function MainContent() {
       />
       {/* User Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/home-user" element={<UserHome />} />
-        <Route path="/user-orders" element={<UserOrders />} />
+        <Route path="/home-user" element={
+          <>
+          <UserHome />
+          <Footer />
+          </>
+        } />
+        <Route path="/user-orders" element={
+          <>
+          <UserOrders />
+          <Footer />
+          </>
+        } />
         <Route
           path="/calculate-ecoscore"
           element={
@@ -158,6 +197,7 @@ function MainContent() {
             <>
               <NavBarUser />
               <UpdateUserDetails />
+              <Footer />
             </>
           }
         />

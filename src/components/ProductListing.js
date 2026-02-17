@@ -243,7 +243,7 @@ const ProductListing = ({ searchTerm }) => {
                     ₹{product.price.toFixed(2)}
                   </p>
                   <p className="mt-1 text-sm text-amber-600 font-medium">
-                    EcoScore: {product.ecoscore?.toFixed(1) || "N/A"} / 100
+                    Carbon Footprint: {product.ecoscore?.toFixed(1) || "N/A"} Kg of C02
                   </p>
                   <p className="mt-2 text-sm text-slate-500 leading-relaxed">
                     {product.product_description?.slice(0, 80)}...

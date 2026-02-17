@@ -28,7 +28,9 @@ export default function SecurityQuestions() {
 
       // navigate("/eco-home");
       const res = await axios.post(
-        "http://localhost:8000/api/mfa/verify-questions/",
+        // "http://localhost:8000/api/mfa/verify-questions/",
+        // "http://10.209.81.82:8000/api/mfa/verify-questions/",
+        `${process.env.REACT_APP_PHONE_API_URL}/api/mfa/verify-questions/`,
         {
           user_id: state.user_id,
           city: answers.city,
